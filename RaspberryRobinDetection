@@ -1,0 +1,10 @@
+SecurityAlert
+| where TimeGenerated > ago(30d)
+| where isnotempty(CompromisedEntity) and CompromisedEntity != "CompromisedEntity"
+| project TimeGenerated, ProviderName, AlertName, CompromisedEntity
+| summarize
+    ['Alert Names']=make_set(AlertName),
+    ['Count of Unique Alerts']=dcount(AlertName)
+    by CompromisedEntity, bin(TimeGenerated, 4h)
+| where ['Count of Unique Alerts'] >= 3
+| where ['Alert Names'] contains "Potential Raspberry Robin worm"
